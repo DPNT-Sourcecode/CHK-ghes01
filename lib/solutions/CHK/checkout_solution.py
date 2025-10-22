@@ -6,6 +6,9 @@ class CheckoutSolution:
         if "E" in items:
             free_bs = items["E"] // 2
             items["B"] = max(0, items["B"] - free_bs)
+        if "F" in items:
+            free_fs = items["F"] // 3
+            items["F"] = max(0, items["F"] - free_fs)
         return items
 
     def _calculate_cost(self, sku: str, num_items: int):
@@ -48,6 +51,7 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
+
 
 
 
