@@ -188,17 +188,26 @@ class TestApplyGroupBuyOffers:
         "items,offers,expected",
         [
             (
-                Counter({"A": 3, "B": 2, "C": 1}),
+                Counter("ABC"),
                 [],
-                GroupOfferResult(
-                    remaining_items=Counter({"A": 3, "B": 2, "C": 1}), offer_cost=0
-                ),
+                GroupOfferResult(remaining_items=Counter("ABC"), offer_cost=0),
+            ),
+            (
+                Counter("AAB"),
+                [GroupDiscountOffer(skus=["A", "B"], quantity=2, price=1)],
+                GroupOfferResult(remaining_items=Counter("B"), offer_cost=1),
+            ),
+            (
+                Counter("AAB"),
+                [GroupDiscountOffer(skus=["B", "A"], quantity=2, price=1)],
+                GroupOfferResult(remaining_items=Counter("A"), offer_cost=1),
             ),
         ],
     )
     def test_apply_group_buy_offers(self, items, offers, expected):
         solution = CheckoutSolution()
-        result = solution.apply_group_buy_offers(items, offers)
+        result = solution.calculate_group_offer_discount(items, offers)
         assert result == expected
+
 
 

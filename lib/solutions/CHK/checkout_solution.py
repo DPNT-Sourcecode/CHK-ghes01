@@ -119,7 +119,7 @@ class CheckoutSolution:
                 items[offer.gift_sku] = max(0, items[offer.gift_sku] - free_items)
         return items
 
-    def apply_group_offer_items(
+    def calculate_group_offer_discount(
         self,
         items: Counter[str],
         offers: list[GroupDiscountOffer],
@@ -237,4 +237,5 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+
 
