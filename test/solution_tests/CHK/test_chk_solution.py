@@ -25,6 +25,3 @@ class TestSum:
     )
     def test_checkout(self, items, expected):
         assert CheckoutSolution().checkout(items) == expected
-
-
-

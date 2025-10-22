@@ -2,6 +2,9 @@ from collections import Counter
 
 
 class CheckoutSolution:
+    def apply_free_item_offers(self, items: Counter[str]) -> Counter[str]:
+
+
     def calculate_cost(self, sku, num_items):
         match sku:
             case "A":
@@ -18,7 +21,7 @@ class CheckoutSolution:
                 raise ValueError("Invalid SKU")
 
     # skus = unicode string
-    def checkout(self, skus):
+    def checkout(self, skus: str) -> int:
         # assuming just AAABCD etc
         # not sure if there will be 3A5B etc
         ordered_items = Counter(skus)
@@ -30,5 +33,3 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
-
-
