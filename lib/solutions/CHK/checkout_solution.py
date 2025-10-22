@@ -100,12 +100,39 @@ class CheckoutSolution:
     def apply_free_item_offers(
         self, items: Counter[str], offers: list[FreeItemOffer]
     ) -> Counter[str]:
-        """Apply free item offers to the item counts."""
+        """Apply free item offers to the item counts.
+
+        Note: We assume there are no cycles in the Buy N get X offers.
+        """
         items = items.copy()
         for offer in offers:
             if offer.sku in items:
                 free_items = (items[offer.sku] // offer.quantity) * offer.gift_quantity
                 items[offer.gift_sku] = max(0, items[offer.gift_sku] - free_items)
+        return items
+
+    def apply_group_offer_items(
+        self,
+        items: Counter[str],
+        offers: list[GroupDiscountOffer],
+        base_prices: dict[str, int],
+    ) -> Counter[str]:
+        """Apply group offers to the item counts.
+
+        Note: We assume group buy offers are disjoint from other offer types (free item offers, multibuy offers).
+        Items in group buy offers should not participate in other promotional schemes.
+
+        Our policy is to favor the customer, hence we should remove the most expensive items
+        in the group buy offers first to maximize their discount benefit.
+        """
+        for offer in offers:
+            if offer.sku in items:
+                num_items = items[offer.sku]
+                num_groups = num_items // offer.quantity
+                items[offer.sku] = num_items % offer.quantity
+                items[offer.discount_sku] = max(
+                    0, items[offer.discount_sku] + num_groups
+                )
         return items
 
     def calculate_multibuy_cost(
@@ -182,4 +209,5 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+
 
