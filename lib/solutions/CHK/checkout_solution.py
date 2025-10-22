@@ -175,10 +175,3 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
-
-
-
-
-
-
-
