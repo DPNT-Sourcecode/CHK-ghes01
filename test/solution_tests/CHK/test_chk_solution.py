@@ -13,16 +13,18 @@ class TestSum:
             ("AA", 100),
             ("AAA", 130),
             ("AAAA", 180),
-            ("AAAAA", 200),
-            ("AAAAAA", 250),
+            ("AAAAA", 130 + 50 * 2),
+            ("AAAAAA", 130 * 2),
             ("BB", 45),
             ("BBB", 75),
             ("BBBB", 90),
             ("ABCD", 115),
             ("", 0),
+            ("INVALID", -1),
         ],
     )
     def test_checkout(self, items, expected):
         assert CheckoutSolution().checkout(items) == expected
+
 
 
