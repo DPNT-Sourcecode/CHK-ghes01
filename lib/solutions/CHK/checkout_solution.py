@@ -21,10 +21,14 @@ class CheckoutSolution:
         # Define free item offers
         self.free_item_offers = [
             FreeItemOffer(sku="E", quantity=2, gift_sku="B", gift_quantity=1),
-            FreeItemOffer(sku="F", quantity=2, gift_sku="F", gift_quantity=1),
+            FreeItemOffer(
+                sku="F", quantity=3, gift_sku="F", gift_quantity=1
+            ),  # buy 2 F get 1 F free
             FreeItemOffer(sku="N", quantity=3, gift_sku="M", gift_quantity=1),
             FreeItemOffer(sku="R", quantity=3, gift_sku="Q", gift_quantity=1),
-            FreeItemOffer(sku="U", quantity=3, gift_sku="U", gift_quantity=1),
+            FreeItemOffer(
+                sku="U", quantity=4, gift_sku="U", gift_quantity=1
+            ),  # buy 3 U get 1 U free
         ]
 
         # Define multibuy offers per SKU (sorted by quantity descending)
@@ -114,6 +118,7 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
+
 
 
 
