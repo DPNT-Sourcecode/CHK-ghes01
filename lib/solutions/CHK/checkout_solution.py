@@ -16,7 +16,10 @@ class FreeItemOffer(BaseModel, frozen=True):
 
 
 class GroupDiscountOffer(BaseModel, frozen=True):
-    """Any quantity of skus for price."""
+    """Any quantity of skus for price.
+
+    Note: skus should be ordered from most to least expensive.
+    """
 
     skus: list[str]
     quantity: int
@@ -115,7 +118,6 @@ class CheckoutSolution:
         self,
         items: Counter[str],
         offers: list[GroupDiscountOffer],
-        base_prices: dict[str, int],
     ) -> Counter[str]:
         """Apply group offers to the item counts.
 
@@ -124,16 +126,8 @@ class CheckoutSolution:
 
         Our policy is to favor the customer, hence we should remove the most expensive items
         in the group buy offers first to maximize their discount benefit.
+        Group buy offers are ordered from most expensive skus to the least.
         """
-        for offer in offers:
-            if offer.sku in items:
-                num_items = items[offer.sku]
-                num_groups = num_items // offer.quantity
-                items[offer.sku] = num_items % offer.quantity
-                items[offer.discount_sku] = max(
-                    0, items[offer.discount_sku] + num_groups
-                )
-        return items
 
     def calculate_multibuy_cost(
         self, items: Counter[str], multibuy_offers: dict[str, list[MultiBuyOffer]]
@@ -209,5 +203,6 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+
 
 
