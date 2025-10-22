@@ -135,9 +135,16 @@ class TestCalculateSKUCost:
     @pytest.mark.parametrize(
         "sku,num_items,base_prices,multibuy_offers,expected",
         [
-            ("C", 3, {"C": 20}, {}, 60),
-            ("B", 3, {"B": 30}, {"B": [MultiBuyOffer(quantity=2, price=45)]}, 75),
-            (
+            pytest.param("C", 3, {"C": 20}, {}, 60, id="no_offer"),
+            pytest.param(
+                "B",
+                3,
+                {"B": 30},
+                {"B": [MultiBuyOffer(quantity=2, price=45)]},
+                75,
+                id="single_multibuy_offer",
+            ),
+            pytest.param(
                 "A",
                 8,
                 {"A": 50},
@@ -148,6 +155,7 @@ class TestCalculateSKUCost:
                     ]
                 },
                 330,
+                id="multiple_multibuy_offers",
             ),
         ],
     )
@@ -171,3 +179,4 @@ class TestCalculateMultibuyCost:
         solution = CheckoutSolution()
         result = solution.calculate_multibuy_cost(items, solution.multibuy_offers)
         assert result == expected
+
