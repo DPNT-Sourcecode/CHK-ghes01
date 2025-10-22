@@ -131,6 +131,7 @@ class CheckoutSolution:
 
         Our policy is to favor the customer, hence we should remove the most expensive items
         in the group buy offers first to maximize their discount benefit.
+
         Group buy offers are ordered from most expensive skus to the least.
         """
         items = items.copy()
@@ -138,7 +139,7 @@ class CheckoutSolution:
 
         for offer in offers:
             # Count how many items we have that are part of this offer
-            available_items = Counter()
+            available_items: Counter[str] = Counter()
             for sku in offer.skus:
                 if sku in items:
                     available_items[sku] = items[sku]
@@ -148,7 +149,6 @@ class CheckoutSolution:
             num_offers = total_available // offer.quantity
 
             if num_offers > 0:
-                # Apply the offer by removing items (most expensive first)
                 items_to_remove = num_offers * offer.quantity
                 for sku in offer.skus:
                     if items_to_remove == 0:
@@ -158,7 +158,6 @@ class CheckoutSolution:
                         items[sku] -= removed
                         items_to_remove -= removed
 
-                # Add the offer cost
                 total_offer_cost += num_offers * offer.price
 
         return GroupOfferResult(remaining_items=items, offer_cost=total_offer_cost)
@@ -237,7 +236,3 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
-
-
-
-

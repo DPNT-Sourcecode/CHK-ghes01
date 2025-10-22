@@ -179,4 +179,3 @@ class TestCalculateMultibuyCost:
         solution = CheckoutSolution()
         result = solution.calculate_multibuy_cost(items, solution.multibuy_offers)
         assert result == expected
-
