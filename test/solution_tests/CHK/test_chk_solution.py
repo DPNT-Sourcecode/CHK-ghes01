@@ -141,9 +141,3 @@ class TestApplyGroupBuyOffers:
         result = solution.calculate_group_offer_discount(items, offers)
         assert result.remaining_items == expected.remaining_items
         assert result.offer_cost == expected.offer_cost
-
-
-
-
-
-

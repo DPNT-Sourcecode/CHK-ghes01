@@ -102,7 +102,8 @@ class CheckoutSolution:
             "Z": 50,
         }
 
-    def parse_skus(self, skus: str, base_prices: dict[str, int]) -> Counter[str]:
+    @staticmethod
+    def parse_skus(skus: str, base_prices: dict[str, int]) -> Counter[str]:
         """Parse SKU string into a Counter of items."""
         counter = Counter(skus)
         # Check that all SKUs are valid
@@ -111,8 +112,9 @@ class CheckoutSolution:
                 raise ValueError(f"Invalid SKU: {sku}")
         return counter
 
+    @staticmethod
     def apply_free_item_offers(
-        self, items: Counter[str], offers: list[FreeItemOffer]
+        items: Counter[str], offers: list[FreeItemOffer]
     ) -> Counter[str]:
         """Apply free item offers to the item counts.
 
@@ -125,8 +127,8 @@ class CheckoutSolution:
                 items[offer.gift_sku] = max(0, items[offer.gift_sku] - free_items)
         return items
 
+    @staticmethod
     def calculate_group_offer_discount(
-        self,
         items: Counter[str],
         offers: list[GroupDiscountOffer],
     ) -> GroupOfferResult:
@@ -169,8 +171,8 @@ class CheckoutSolution:
 
         return GroupOfferResult(remaining_items=items, offer_cost=total_offer_cost)
 
+    @staticmethod
     def calculate_multibuy_cost(
-        self,
         items: Counter[str],
         base_prices: dict[str, int],
         multibuy_offers: dict[str, list[MultiBuyOffer]],
@@ -192,8 +194,8 @@ class CheckoutSolution:
 
         return total_cost
 
+    @staticmethod
     def calculate_sku_cost(
-        self,
         sku: str,
         num_items: int,
         base_prices: dict[str, int],
@@ -248,9 +250,3 @@ class CheckoutSolution:
         )
 
         return total_cost
-
-
-
-
-
-
