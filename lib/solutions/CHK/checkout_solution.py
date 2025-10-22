@@ -2,10 +2,13 @@ from collections import Counter
 
 
 class CheckoutSolution:
-    def apply_free_item_offers(self, items: Counter[str]) -> Counter[str]:
+    def _apply_free_item_offers(self, items: Counter[str]) -> Counter[str]:
+        if "E" in items:
+            free_bs = items["E"] // 2
+            items["B"] = min(0, items["B"] - free_bs)
+        return items
 
-
-    def calculate_cost(self, sku, num_items):
+    def _calculate_cost(self, sku: str, num_items: int):
         match sku:
             case "A":
                 offer_cost = num_items // 3
@@ -22,14 +25,15 @@ class CheckoutSolution:
 
     # skus = unicode string
     def checkout(self, skus: str) -> int:
-        # assuming just AAABCD etc
-        # not sure if there will be 3A5B etc
         ordered_items = Counter(skus)
+        # Apply get free offers first
+        ordered_items = self._apply_free_item_offers(ordered_items)
         total_cost = 0
         try:
             for sku, num_items in ordered_items.items():
-                cost = self.calculate_cost(sku, num_items)
+                cost = self._calculate_cost(sku, num_items)
                 total_cost += cost
             return total_cost
         except ValueError as e:
             return -1
+
