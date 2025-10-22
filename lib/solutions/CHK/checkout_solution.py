@@ -161,7 +161,7 @@ class CheckoutSolution:
 
                 total_offer_cost += num_offers * offer.price
 
-        return GroupOfferResult(remaining_items=items, offer_cost=total_offer_cost)
+        return GroupOfferResult(remaining_items=+items, offer_cost=total_offer_cost)
 
     def calculate_multibuy_cost(
         self, items: Counter[str], multibuy_offers: dict[str, list[MultiBuyOffer]]
@@ -237,5 +237,6 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+
 
 
