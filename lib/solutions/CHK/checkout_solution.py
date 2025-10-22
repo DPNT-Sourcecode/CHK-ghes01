@@ -150,6 +150,7 @@ class CheckoutSolution:
 
             if num_offers > 0:
                 items_to_remove = num_offers * offer.quantity
+                # remove most expensive skus first
                 for sku in offer.skus:
                     if items_to_remove == 0:
                         break
@@ -236,3 +237,4 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+

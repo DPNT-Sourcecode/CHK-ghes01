@@ -179,3 +179,18 @@ class TestCalculateMultibuyCost:
         solution = CheckoutSolution()
         result = solution.calculate_multibuy_cost(items, solution.multibuy_offers)
         assert result == expected
+
+
+class TestApplyGroupBuyOffers:
+    @pytest.mark.parametrize(
+        "items,offers,expected",
+        [
+            (Counter({"A": 3, "B": 2, "C": 1}), [], 130 + 45 + 20),
+            (Counter(), [], 0),
+        ],
+    )
+    def test_apply_group_buy_offers(self, items, offers, expected):
+        solution = CheckoutSolution()
+        result = solution.apply_group_buy_offers(items, offers)
+        assert result == expected
+
