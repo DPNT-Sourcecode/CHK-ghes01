@@ -12,6 +12,7 @@ class CheckoutSolution:
         match sku:
             case "A":
                 # Multi-priced offers: (quantity, price) sorted by quantity descending
+                # TODO: maybe pydantic dict to hold all
                 offers = [(5, 200), (3, 130)]
                 cost = 0
                 remaining = num_items
@@ -20,7 +21,6 @@ class CheckoutSolution:
                     cost += (remaining // quantity) * price
                     remaining = remaining % quantity
 
-                # Regular price for remaining items
                 cost += remaining * 50
                 return cost
             case "B":
@@ -30,6 +30,8 @@ class CheckoutSolution:
                 return num_items * 20
             case "D":
                 return num_items * 15
+            case "E":
+                return num_items * 40
             case _:
                 raise ValueError("Invalid SKU")
 
@@ -46,5 +48,6 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
+
 
 
