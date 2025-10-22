@@ -60,7 +60,7 @@ DEFAULT_MULTIBUY_OFFERS = {
         MultiBuyOffer(quantity=10, price=80),
         MultiBuyOffer(quantity=5, price=45),
     ],
-    "K": [MultiBuyOffer(quantity=2, price=150)],
+    "K": [MultiBuyOffer(quantity=2, price=120)],
     "P": [MultiBuyOffer(quantity=5, price=200)],
     "Q": [MultiBuyOffer(quantity=3, price=80)],
     "V": [
@@ -68,6 +68,12 @@ DEFAULT_MULTIBUY_OFFERS = {
         MultiBuyOffer(quantity=2, price=90),
     ],
 }
+
+DEFAULT_GROUP_DISCOUNT_OFFERS = [
+    # Buy any 3 of (S,T,X,Y,Z) for 45
+    # Ordered by price descending: Z(21), S(20), T(20), Y(20), X(17)
+    GroupDiscountOffer(skus=["Z", "S", "T", "Y", "X"], quantity=3, price=45),
+]
 
 DEFAULT_BASE_PRICES = {
     "A": 50,
@@ -104,6 +110,7 @@ class CheckoutSolution:
         self,
         free_item_offers: list[FreeItemOffer] | None = None,
         multibuy_offers: dict[str, list[MultiBuyOffer]] | None = None,
+        group_discount_offers: list[GroupDiscountOffer] | None = None,
         base_prices: dict[str, int] | None = None,
     ):
         # Define free item offers
@@ -116,6 +123,13 @@ class CheckoutSolution:
         # Define multibuy offers per SKU (sorted by quantity descending)
         self.multibuy_offers = (
             multibuy_offers if multibuy_offers is not None else DEFAULT_MULTIBUY_OFFERS
+        )
+
+        # Define group discount offers
+        self.group_discount_offers = (
+            group_discount_offers
+            if group_discount_offers is not None
+            else DEFAULT_GROUP_DISCOUNT_OFFERS
         )
 
         # Define base prices
@@ -265,11 +279,18 @@ class CheckoutSolution:
             ordered_items, self.free_item_offers
         )
 
-        # Calculate total cost
-        total_cost = self.calculate_multibuy_cost(
-            ordered_items, self.base_prices, self.multibuy_offers
+        # Apply group discount offers
+        group_result = self.calculate_group_offer_discount(
+            ordered_items, self.group_discount_offers
+        )
+        total_cost = group_result.offer_cost
+
+        # Calculate cost for remaining items with multibuy offers
+        total_cost += self.calculate_multibuy_cost(
+            group_result.remaining_items, self.base_prices, self.multibuy_offers
         )
 
         return total_cost
+
 
 

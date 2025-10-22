@@ -207,3 +207,29 @@ class TestApplyGroupBuyOffers:
         assert total_cost == expected_total
 
 
+class TestIntegratedCheckout:
+    """Test the full checkout flow with the latest price table."""
+
+    def test_all_offer_types_combined(self):
+        """Test all offer types: free items, multibuy, and group discount.
+
+        Basket: AAAAAABBBBEEEFFFNNNMKKPPPPPQQQRRRSSTXYZ
+        - A: 6 items -> 5A for 200 + 1A for 50 = 250
+        - B: 4 items, 2E gives 1B free (2 times) -> 2B remaining -> 2B for 45
+        - E: 3 items -> 3 * 40 = 120
+        - F: 3 items -> 2F get 1F free -> 2F = 20
+        - N: 3 items, M: 1 item -> 3N get 1M free -> 3N = 120, M free
+        - K: 2 items -> 2K for 120
+        - P: 5 items -> 5P for 200
+        - Q: 3 items, R: 3 items -> 3R get 1Q free -> 3Q remaining -> 3Q for 80, 3R = 150
+        - S: 2 items, T: 1 item, X: 1 item, Y: 1 item, Z: 1 item (6 items)
+          -> 2 group offers = 90
+
+        Total: 250 + 45 + 120 + 20 + 120 + 0 + 120 + 200 + 80 + 150 + 90 = 1195
+        """
+        solution = CheckoutSolution()
+        result = solution.checkout("AAAAAABBBBEEEFFFNNNMKKPPPPPQQQRRRSSTXYZ")
+        assert result == 1195
+
+
+
