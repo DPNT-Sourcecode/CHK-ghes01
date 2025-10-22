@@ -1,3 +1,6 @@
+from collections import Counter
+
+
 class CheckoutSolution:
     def calculate_cost(self, sku, num_items):
         match sku:
@@ -16,5 +19,16 @@ class CheckoutSolution:
 
     # skus = unicode string
     def checkout(self, skus):
-        raise NotImplementedError()
+        # assuming just AAABCD etc
+        # not sure if there will be 3A5B etc
+        ordered_items = Counter(skus)
+        total_cost = 0
+        try:
+            for sku, num_items in ordered_items.items():
+                cost = self.calculate_cost(sku, num_items)
+                total_cost += cost
+            return total_cost
+        except ValueError as e:
+            return -1
+
 
