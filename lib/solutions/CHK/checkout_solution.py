@@ -30,9 +30,9 @@ class GroupOfferResult(BaseModel, frozen=True):
     remaining_items: Counter[str]
     offer_cost: int
 
-    @field_validator("remaining_items")
+    @field_validator("remaining_items", mode="before")
     @classmethod
-    def normalize_counter(cls, v):
+    def normalize_counter(cls, v: Counter[str]) -> Counter[str]:
         # Remove zero and negative counts
         return +v
 
@@ -243,6 +243,7 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+
 
 
 

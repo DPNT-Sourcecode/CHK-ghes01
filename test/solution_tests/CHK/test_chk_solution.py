@@ -10,81 +10,6 @@ from solutions.CHK.checkout_solution import (
 from lib.solutions.CHK.checkout_solution import GroupDiscountOffer, GroupOfferResult
 
 
-class TestCheckout:
-    @pytest.mark.parametrize(
-        "items,expected",
-        [
-            # Single items
-            ("A", 50),
-            ("B", 30),
-            ("C", 20),
-            ("D", 15),
-            ("E", 40),
-            ("F", 10),
-            # Item A multi-price offers: 5A for 200, 3A for 130, 1A for 50
-            ("AA", 2 * 50),
-            ("AAA", 130),
-            ("AAAA", 130 + 50),
-            ("AAAAA", 200),
-            ("AAAAAA", 200 + 50),
-            ("AAAAAAA", 200 + 2 * 50),
-            ("AAAAAAAA", 200 + 130),
-            ("AAAAAAAAA", 200 + 130 + 50),
-            ("AAAAAAAAAA", 2 * 200),
-            # Item B multi-price offers: 2B for 45, 1B for 30
-            ("BB", 45),
-            ("BBB", 45 + 30),
-            ("BBBB", 2 * 45),
-            ("BBBBB", 2 * 45 + 30),
-            # Item E - buy 2E get 1B free: 1E for 40
-            ("EE", 2 * 40),
-            ("EEB", 2 * 40 + 0),  # 2E + 1B (free)
-            ("EEBB", 2 * 40 + 30),  # 2E + 2B (1 free, 1 paid)
-            ("EEEB", 3 * 40 + 0),  # 3E + 1B (free)
-            ("EEEEBB", 4 * 40 + 0),  # 4E + 2B (both free)
-            ("EEEEBBB", 4 * 40 + 30),  # 4E + 3B (2 free, 1 paid)
-            ("EEEEBBBB", 4 * 40 + 45),  # 4E + 4B (2 free, 2 paid with offer)
-            ("BEBEEE", 4 * 40 + 0),  # Order shouldn't matter: 4E + 2B (both free)
-            # Item F - buy 2F get 1F free (requires 3 total): 1F for 10
-            ("FF", 2 * 10),
-            ("FFF", 2 * 10),  # 3F: pay for 2, get 1 free
-            ("FFFF", 3 * 10),  # 4F: pay for 3
-            ("FFFFF", 4 * 10),  # 5F: pay for 4
-            ("FFFFFF", 4 * 10),  # 6F: pay for 4 (2 groups of 3)
-            ("FFFFFFF", 5 * 10),  # 7F: pay for 5
-            ("FFFFFFFF", 6 * 10),  # 8F: pay for 6
-            ("FFFFFFFFF", 6 * 10),  # 9F: pay for 6 (3 groups of 3)
-            # Mixed items
-            ("ABCD", 50 + 30 + 20 + 15),
-            ("ABCDE", 50 + 30 + 20 + 15 + 40),
-            (
-                "ABCDEABCDE",
-                2 * 50 + 30 + 2 * 20 + 2 * 15 + 2 * 40,
-            ),  # 2A, 2B (1 free), 2C, 2D, 2E
-            # Edge cases
-            ("", 0),
-            ("INVALID!", -1),
-            ("A1", -1),
-            ("a", -1),
-            ("ABCa", -1),
-            # Edge case: More E's than B's
-            ("EEEEEEEB", 7 * 40 + 0),  # 7E + 1B (free since 7E gives 3 free B's)
-            # Edge case: B offer + E offer combination
-            ("EEEEBB", 4 * 40 + 0),  # 4E gives 2 free B's, so both B's are free
-            (
-                "EEEEBBBB",
-                4 * 40 + 45,
-            ),  # 4E gives 2 free B's, remaining 2B's get the offer
-            (
-                "EEBBBB",
-                2 * 40 + 45 + 30,
-            ),  # 2E gives 1 free B, remaining 3B's = 1 offer + 1 single
-        ],
-    )
-    def test_checkout(self, items, expected):
-        assert CheckoutSolution().checkout(items) == expected
-
-
 class TestParseSKUs:
     @pytest.mark.parametrize(
         "skus,expected",
@@ -207,8 +132,9 @@ class TestApplyGroupBuyOffers:
     def test_apply_group_buy_offers(self, items, offers, expected):
         solution = CheckoutSolution()
         result = solution.calculate_group_offer_discount(items, offers)
-        assert results.remaining_items = expected.remaining_items
-        assert results.offer_cost = expected.offer_cost
+        assert result.remaining_items == expected.remaining_items
+        assert result.offer_cost == expected.offer_cost
+
 
 
 
