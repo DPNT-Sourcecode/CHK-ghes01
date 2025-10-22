@@ -26,6 +26,11 @@ class GroupDiscountOffer(BaseModel, frozen=True):
     price: int
 
 
+class GroupOfferResult(BaseModel, frozen=True):
+    remaining_items: Counter[str]
+    offer_cost: int
+
+
 class CheckoutSolution:
     def __init__(self):
         # Define free item offers
@@ -118,7 +123,7 @@ class CheckoutSolution:
         self,
         items: Counter[str],
         offers: list[GroupDiscountOffer],
-    ) -> Counter[str]:
+    ) -> GroupOfferResult:
         """Apply group offers to the item counts.
 
         Note: We assume group buy offers are disjoint from other offer types (free item offers, multibuy offers).
@@ -128,6 +133,35 @@ class CheckoutSolution:
         in the group buy offers first to maximize their discount benefit.
         Group buy offers are ordered from most expensive skus to the least.
         """
+        items = items.copy()
+        total_offer_cost = 0
+
+        for offer in offers:
+            # Count how many items we have that are part of this offer
+            available_items = Counter()
+            for sku in offer.skus:
+                if sku in items:
+                    available_items[sku] = items[sku]
+
+            # Calculate how many times we can apply this offer
+            total_available = sum(available_items.values())
+            num_offers = total_available // offer.quantity
+
+            if num_offers > 0:
+                # Apply the offer by removing items (most expensive first)
+                items_to_remove = num_offers * offer.quantity
+                for sku in offer.skus:
+                    if items_to_remove == 0:
+                        break
+                    if sku in items and items[sku] > 0:
+                        removed = min(items[sku], items_to_remove)
+                        items[sku] -= removed
+                        items_to_remove -= removed
+
+                # Add the offer cost
+                total_offer_cost += num_offers * offer.price
+
+        return GroupOfferResult(remaining_items=items, offer_cost=total_offer_cost)
 
     def calculate_multibuy_cost(
         self, items: Counter[str], multibuy_offers: dict[str, list[MultiBuyOffer]]
@@ -203,6 +237,7 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+
 
 
 
