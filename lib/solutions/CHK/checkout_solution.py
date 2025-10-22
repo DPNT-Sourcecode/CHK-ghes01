@@ -37,70 +37,91 @@ class GroupOfferResult(BaseModel, frozen=True):
         return +v
 
 
+# Default constants
+DEFAULT_FREE_ITEM_OFFERS = [
+    FreeItemOffer(sku="E", quantity=2, gift_sku="B", gift_quantity=1),
+    FreeItemOffer(
+        sku="F", quantity=3, gift_sku="F", gift_quantity=1
+    ),  # buy 2 F get 1 F free
+    FreeItemOffer(sku="N", quantity=3, gift_sku="M", gift_quantity=1),
+    FreeItemOffer(sku="R", quantity=3, gift_sku="Q", gift_quantity=1),
+    FreeItemOffer(
+        sku="U", quantity=4, gift_sku="U", gift_quantity=1
+    ),  # buy 3 U get 1 U free
+]
+
+DEFAULT_MULTIBUY_OFFERS = {
+    "A": [
+        MultiBuyOffer(quantity=5, price=200),
+        MultiBuyOffer(quantity=3, price=130),
+    ],
+    "B": [MultiBuyOffer(quantity=2, price=45)],
+    "H": [
+        MultiBuyOffer(quantity=10, price=80),
+        MultiBuyOffer(quantity=5, price=45),
+    ],
+    "K": [MultiBuyOffer(quantity=2, price=150)],
+    "P": [MultiBuyOffer(quantity=5, price=200)],
+    "Q": [MultiBuyOffer(quantity=3, price=80)],
+    "V": [
+        MultiBuyOffer(quantity=3, price=130),
+        MultiBuyOffer(quantity=2, price=90),
+    ],
+}
+
+DEFAULT_BASE_PRICES = {
+    "A": 50,
+    "B": 30,
+    "C": 20,
+    "D": 15,
+    "E": 40,
+    "F": 10,
+    "G": 20,
+    "H": 10,
+    "I": 35,
+    "J": 60,
+    "K": 80,
+    "L": 90,
+    "M": 15,
+    "N": 40,
+    "O": 10,
+    "P": 50,
+    "Q": 30,
+    "R": 50,
+    "S": 30,
+    "T": 20,
+    "U": 40,
+    "V": 50,
+    "W": 20,
+    "X": 90,
+    "Y": 10,
+    "Z": 50,
+}
+
+
 class CheckoutSolution:
-    def __init__(self):
+    def __init__(
+        self,
+        free_item_offers: list[FreeItemOffer] | None = None,
+        multibuy_offers: dict[str, list[MultiBuyOffer]] | None = None,
+        base_prices: dict[str, int] | None = None,
+    ):
         # Define free item offers
-        self.free_item_offers = [
-            FreeItemOffer(sku="E", quantity=2, gift_sku="B", gift_quantity=1),
-            FreeItemOffer(
-                sku="F", quantity=3, gift_sku="F", gift_quantity=1
-            ),  # buy 2 F get 1 F free
-            FreeItemOffer(sku="N", quantity=3, gift_sku="M", gift_quantity=1),
-            FreeItemOffer(sku="R", quantity=3, gift_sku="Q", gift_quantity=1),
-            FreeItemOffer(
-                sku="U", quantity=4, gift_sku="U", gift_quantity=1
-            ),  # buy 3 U get 1 U free
-        ]
+        self.free_item_offers = (
+            free_item_offers
+            if free_item_offers is not None
+            else DEFAULT_FREE_ITEM_OFFERS
+        )
 
         # Define multibuy offers per SKU (sorted by quantity descending)
-        self.multibuy_offers = {
-            "A": [
-                MultiBuyOffer(quantity=5, price=200),
-                MultiBuyOffer(quantity=3, price=130),
-            ],
-            "B": [MultiBuyOffer(quantity=2, price=45)],
-            "H": [
-                MultiBuyOffer(quantity=10, price=80),
-                MultiBuyOffer(quantity=5, price=45),
-            ],
-            "K": [MultiBuyOffer(quantity=2, price=150)],
-            "P": [MultiBuyOffer(quantity=5, price=200)],
-            "Q": [MultiBuyOffer(quantity=3, price=80)],
-            "V": [
-                MultiBuyOffer(quantity=3, price=130),
-                MultiBuyOffer(quantity=2, price=90),
-            ],
-        }
+        self.multibuy_offers = (
+            multibuy_offers if multibuy_offers is not None else DEFAULT_MULTIBUY_OFFERS
+        )
 
         # Define base prices
-        self.base_prices = {
-            "A": 50,
-            "B": 30,
-            "C": 20,
-            "D": 15,
-            "E": 40,
-            "F": 10,
-            "G": 20,
-            "H": 10,
-            "I": 35,
-            "J": 60,
-            "K": 80,
-            "L": 90,
-            "M": 15,
-            "N": 40,
-            "O": 10,
-            "P": 50,
-            "Q": 30,
-            "R": 50,
-            "S": 30,
-            "T": 20,
-            "U": 40,
-            "V": 50,
-            "W": 20,
-            "X": 90,
-            "Y": 10,
-            "Z": 50,
-        }
+        self.base_prices = (
+            base_prices if base_prices is not None else DEFAULT_BASE_PRICES
+        )
 
     @staticmethod
     def parse_skus(skus: str, base_prices: dict[str, int]) -> Counter[str]:
@@ -250,3 +271,4 @@ class CheckoutSolution:
         )
 
         return total_cost
+
