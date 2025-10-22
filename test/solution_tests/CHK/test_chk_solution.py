@@ -86,6 +86,32 @@ class TestCalculateSKUCost:
                 330,
                 id="multiple_multibuy_offers",
             ),
+            pytest.param(
+                "H",
+                10,
+                {"H": 10},
+                {
+                    "H": [
+                        MultiBuyOffer(quantity=10, price=80),
+                        MultiBuyOffer(quantity=5, price=45),
+                    ]
+                },
+                80,
+                id="exact_quantity_prefers_larger_offer",
+            ),
+            pytest.param(
+                "A",
+                6,
+                {"A": 50},
+                {
+                    "A": [
+                        MultiBuyOffer(quantity=5, price=200),
+                        MultiBuyOffer(quantity=3, price=130),
+                    ]
+                },
+                250,
+                id="greedy_applies_largest_offer_first",
+            ),
         ],
     )
     def test_calculate_sku_cost(
@@ -141,3 +167,4 @@ class TestApplyGroupBuyOffers:
         result = solution.calculate_group_offer_discount(items, offers)
         assert result.remaining_items == expected.remaining_items
         assert result.offer_cost == expected.offer_cost
+
