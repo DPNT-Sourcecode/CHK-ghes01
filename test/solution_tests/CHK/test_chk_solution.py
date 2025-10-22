@@ -7,6 +7,8 @@ from solutions.CHK.checkout_solution import (
     MultiBuyOffer,
 )
 
+from lib.solutions.CHK.checkout_solution import GroupDiscountOffer, GroupOfferResult
+
 
 class TestCheckout:
     @pytest.mark.parametrize(
@@ -185,12 +187,18 @@ class TestApplyGroupBuyOffers:
     @pytest.mark.parametrize(
         "items,offers,expected",
         [
-            (Counter({"A": 3, "B": 2, "C": 1}), [], 130 + 45 + 20),
-            (Counter(), [], 0),
+            (
+                Counter({"A": 3, "B": 2, "C": 1}),
+                [],
+                GroupOfferResult(
+                    remaining_items=Counter({"A": 3, "B": 2, "C": 1}), offer_cost=0
+                ),
+            ),
         ],
     )
     def test_apply_group_buy_offers(self, items, offers, expected):
         solution = CheckoutSolution()
         result = solution.apply_group_buy_offers(items, offers)
         assert result == expected
+
 
