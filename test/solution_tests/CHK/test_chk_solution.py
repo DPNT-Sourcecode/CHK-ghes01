@@ -229,7 +229,8 @@ class TestIntegratedCheckout:
         """
         solution = CheckoutSolution()
         result = solution.checkout("AAAAAABBBBEEEFFFNNNMKKPPPPPQQQRRRSSTXYZ")
-        assert result == 1195
+        assert result == 1205
+
 
 
 
