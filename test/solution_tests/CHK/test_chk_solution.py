@@ -145,20 +145,23 @@ class TestApplyGroupBuyOffers:
     @pytest.mark.parametrize(
         "items,offers,expected",
         [
-            (
+            pytest.param(
                 Counter("ABC"),
                 [],
                 GroupOfferResult(remaining_items=Counter("ABC"), offer_cost=0),
+                id="no_group_offers",
             ),
-            (
+            pytest.param(
                 Counter("AAB"),
                 [GroupDiscountOffer(skus=["A", "B"], quantity=2, price=1)],
                 GroupOfferResult(remaining_items=Counter("B"), offer_cost=1),
+                id="removes_most_expensive_first_A_then_B",
             ),
-            (
+            pytest.param(
                 Counter("AAB"),
                 [GroupDiscountOffer(skus=["B", "A"], quantity=2, price=1)],
                 GroupOfferResult(remaining_items=Counter("A"), offer_cost=1),
+                id="removes_most_expensive_first_B_then_A",
             ),
         ],
     )
@@ -192,6 +195,13 @@ class TestApplyGroupBuyOffers:
                 40,
                 id="insufficient_for_group_offer",
             ),
+            pytest.param(
+                Counter({"S": 2, "T": 1, "X": 1}),
+                [GroupDiscountOffer(skus=["S", "T", "X"], quantity=3, price=45)],
+                {"S": 20, "T": 20, "X": 17},
+                62,
+                id="removes_most_expensive_first_leaves_cheapest",
+            ),
         ],
     )
     def test_group_offer_total_cost(self, items, offers, base_prices, expected_total):
@@ -215,13 +225,13 @@ class TestIntegratedCheckout:
 
         Basket: AAAAAABBBBEEEFFFNNNMKKPPPPPQQQRRRSSTXYZ
         - A: 6 items -> 5A for 200 + 1A for 50 = 250
-        - B: 4 items, 2E gives 1B free (2 times) -> 2B remaining -> 2B for 45
+        - B: 4 items, 2E gives 1B free -> 3B remaining -> 2B for 45 + B = 75
         - E: 3 items -> 3 * 40 = 120
         - F: 3 items -> 2F get 1F free -> 2F = 20
         - N: 3 items, M: 1 item -> 3N get 1M free -> 3N = 120, M free
         - K: 2 items -> 2K for 120
         - P: 5 items -> 5P for 200
-        - Q: 3 items, R: 3 items -> 3R get 1Q free -> 3Q remaining -> 3Q for 80, 3R = 150
+        - Q: 3 items, R: 3 items -> 3R get 1Q free -> 2Q for 60, 3R = 150
         - S: 2 items, T: 1 item, X: 1 item, Y: 1 item, Z: 1 item (6 items)
           -> 2 group offers = 90
 
@@ -230,6 +240,7 @@ class TestIntegratedCheckout:
         solution = CheckoutSolution()
         result = solution.checkout("AAAAAABBBBEEEFFFNNNMKKPPPPPQQQRRRSSTXYZ")
         assert result == 1205
+
 
 
 
