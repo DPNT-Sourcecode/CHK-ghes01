@@ -81,43 +81,92 @@ class CheckoutSolution:
             "Z": 50,
         }
 
-    def _apply_free_item_offers(self, items: Counter[str]) -> Counter[str]:
-        for offer in self.free_item_offers:
+    def parse_skus(self, skus: str) -> Counter[str]:
+        """Parse SKU string into a Counter of items."""
+        return Counter(skus)
+
+    def apply_free_item_offers(
+        self, items: Counter[str], offers: list[FreeItemOffer]
+    ) -> Counter[str]:
+        """Apply free item offers to the item counts."""
+        items = items.copy()
+        for offer in offers:
             if offer.sku in items:
                 free_items = (items[offer.sku] // offer.quantity) * offer.gift_quantity
                 items[offer.gift_sku] = max(0, items[offer.gift_sku] - free_items)
         return items
 
-    def _calculate_cost(self, sku: str, num_items: int):
-        if sku not in self.base_prices:
+    def calculate_multibuy_cost(
+        self, sku: str, num_items: int, offers: list[MultiBuyOffer]
+    ) -> int:
+        """Calculate cost for a SKU with multibuy offers applied."""
+        cost = 0
+        remaining = num_items
+
+        for offer in offers:
+            cost += (remaining // offer.quantity) * offer.price
+            remaining = remaining % offer.quantity
+
+        return cost, remaining
+
+    def calculate_sku_cost(
+        self,
+        sku: str,
+        num_items: int,
+        base_prices: dict[str, int],
+        multibuy_offers: dict[str, list[MultiBuyOffer]],
+    ) -> int:
+        """Calculate total cost for a single SKU including multibuy offers."""
+        if sku not in base_prices:
             raise ValueError("Invalid SKU")
 
         cost = 0
         remaining = num_items
 
         # Apply multibuy offers if available
-        if sku in self.multibuy_offers:
-            for offer in self.multibuy_offers[sku]:
-                cost += (remaining // offer.quantity) * offer.price
-                remaining = remaining % offer.quantity
+        if sku in multibuy_offers:
+            multibuy_cost, remaining = self.calculate_multibuy_cost(
+                sku, num_items, multibuy_offers[sku]
+            )
+            cost += multibuy_cost
 
         # Add cost for remaining items at base price
-        cost += remaining * self.base_prices[sku]
+        cost += remaining * base_prices[sku]
         return cost
+
+    def calculate_total_cost(
+        self,
+        items: Counter[str],
+        base_prices: dict[str, int],
+        multibuy_offers: dict[str, list[MultiBuyOffer]],
+    ) -> int:
+        """Calculate total cost for all items."""
+        total_cost = 0
+        for sku, num_items in items.items():
+            cost = self.calculate_sku_cost(sku, num_items, base_prices, multibuy_offers)
+            total_cost += cost
+        return total_cost
 
     # skus = unicode string
     def checkout(self, skus: str) -> int:
-        ordered_items = Counter(skus)
-        # Apply get free offers first
-        ordered_items = self._apply_free_item_offers(ordered_items)
-        total_cost = 0
         try:
-            for sku, num_items in ordered_items.items():
-                cost = self._calculate_cost(sku, num_items)
-                total_cost += cost
+            # Parse SKUs into item counts
+            ordered_items = self.parse_skus(skus)
+
+            # Apply free item offers
+            ordered_items = self.apply_free_item_offers(
+                ordered_items, self.free_item_offers
+            )
+
+            # Calculate total cost
+            total_cost = self.calculate_total_cost(
+                ordered_items, self.base_prices, self.multibuy_offers
+            )
+
             return total_cost
-        except ValueError as e:
+        except ValueError:
             return -1
+
 
 
 
