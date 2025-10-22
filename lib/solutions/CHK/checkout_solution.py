@@ -8,12 +8,19 @@ class MultiBuyOffer(BaseModel, frozen=True):
     price: int
 
 
-# assume no cycles in free offers (none yet)
 class FreeItemOffer(BaseModel, frozen=True):
     sku: str
     quantity: int
     gift_sku: str
     gift_quantity: int
+
+
+class GroupDiscountOffer(BaseModel, frozen=True):
+    """Any quantity of skus for price."""
+
+    skus: list[str]
+    quantity: int
+    price: int
 
 
 class CheckoutSolution:
@@ -175,3 +182,4 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+
