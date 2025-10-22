@@ -2,5 +2,6 @@ from solutions.CHK.checkout_solution import CheckoutSolution
 
 
 class TestSum:
-    def test_sum(self):
-        assert SumSolution().compute(1, 2) == 3
+    def test_chekout(self):
+        assert CheckoutSolution().checkout(1, 2) == 3
+
