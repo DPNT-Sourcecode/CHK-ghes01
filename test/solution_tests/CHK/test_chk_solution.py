@@ -168,3 +168,42 @@ class TestApplyGroupBuyOffers:
         assert result.remaining_items == expected.remaining_items
         assert result.offer_cost == expected.offer_cost
 
+    @pytest.mark.parametrize(
+        "items,offers,base_prices,expected_total",
+        [
+            pytest.param(
+                Counter({"S": 1, "T": 1, "X": 1}),
+                [GroupDiscountOffer(skus=["S", "T", "X"], quantity=3, price=45)],
+                {"S": 20, "T": 20, "X": 17},
+                45,
+                id="exact_group_offer_match",
+            ),
+            pytest.param(
+                Counter({"S": 2, "T": 2, "X": 2}),
+                [GroupDiscountOffer(skus=["S", "T", "X"], quantity=3, price=45)],
+                {"S": 20, "T": 20, "X": 17},
+                90,
+                id="double_group_offer",
+            ),
+            pytest.param(
+                Counter({"S": 1, "T": 1}),
+                [GroupDiscountOffer(skus=["S", "T", "X"], quantity=3, price=45)],
+                {"S": 20, "T": 20, "X": 17},
+                40,
+                id="insufficient_for_group_offer",
+            ),
+        ],
+    )
+    def test_group_offer_total_cost(self, items, offers, base_prices, expected_total):
+        solution = CheckoutSolution()
+        result = solution.calculate_group_offer_discount(items, offers)
+
+        # Calculate total cost: group offer cost + remaining items at base price
+        remaining_cost = sum(
+            base_prices[sku] * count for sku, count in result.remaining_items.items()
+        )
+        total_cost = result.offer_cost + remaining_cost
+
+        assert total_cost == expected_total
+
+
