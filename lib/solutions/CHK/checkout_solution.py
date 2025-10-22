@@ -54,9 +54,3 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
-
-
-
-
-
-
