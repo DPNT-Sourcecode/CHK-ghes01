@@ -22,13 +22,15 @@ class TestParseSKUs:
     )
     def test_parse_valid_skus(self, skus, expected):
         solution = CheckoutSolution()
-        assert solution.parse_skus(skus) == expected
+        base_prices = {"A": 50, "B": 30, "C": 20}
+        assert solution.parse_skus(skus, base_prices) == expected
 
     @pytest.mark.parametrize("skus", ["a", "1", "!", "ABCx"])
     def test_parse_invalid_skus(self, skus):
         solution = CheckoutSolution()
+        base_prices = {"A": 50, "B": 30, "C": 20}
         with pytest.raises(ValueError):
-            solution.parse_skus(skus)
+            solution.parse_skus(skus, base_prices)
 
 
 class TestApplyFreeItemOffers:
@@ -104,7 +106,12 @@ class TestCalculateMultibuyCost:
     )
     def test_calculate_multibuy_cost(self, items, expected):
         solution = CheckoutSolution()
-        result = solution.calculate_multibuy_cost(items, solution.multibuy_offers)
+        base_prices = {"A": 50, "B": 30, "C": 20}
+        multibuy_offers = {
+            "A": [MultiBuyOffer(quantity=3, price=130)],
+            "B": [MultiBuyOffer(quantity=2, price=45)],
+        }
+        result = solution.calculate_multibuy_cost(items, base_prices, multibuy_offers)
         assert result == expected
 
 
@@ -134,6 +141,7 @@ class TestApplyGroupBuyOffers:
         result = solution.calculate_group_offer_discount(items, offers)
         assert result.remaining_items == expected.remaining_items
         assert result.offer_cost == expected.offer_cost
+
 
 
 
