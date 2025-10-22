@@ -11,8 +11,18 @@ class CheckoutSolution:
     def _calculate_cost(self, sku: str, num_items: int):
         match sku:
             case "A":
-                offer_cost = num_items // 3
-                return offer_cost * 130 + (num_items % 3) * 50
+                # Multi-priced offers: (quantity, price) sorted by quantity descending
+                offers = [(5, 200), (3, 130)]
+                cost = 0
+                remaining = num_items
+
+                for quantity, price in offers:
+                    cost += (remaining // quantity) * price
+                    remaining = remaining % quantity
+
+                # Regular price for remaining items
+                cost += remaining * 50
+                return cost
             case "B":
                 offer_cost = num_items // 2
                 return offer_cost * 45 + (num_items % 2) * 30
@@ -36,4 +46,5 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
+
 
