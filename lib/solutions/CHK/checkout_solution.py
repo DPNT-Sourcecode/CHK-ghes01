@@ -1,5 +1,19 @@
 from collections import Counter
 
+from pydantic import BaseModel
+
+
+class MultiBuyOffer(BaseModel):
+    quantity: int
+    price: int
+
+
+class FreeItemOffer(BaseModel):
+    sku: str
+    quantity: int
+    gift_sku: str
+    gift_quantity: int
+
 
 class CheckoutSolution:
     def _apply_free_item_offers(self, items: Counter[str]) -> Counter[str]:
@@ -54,3 +68,4 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
+
