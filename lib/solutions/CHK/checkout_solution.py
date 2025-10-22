@@ -8,6 +8,7 @@ class MultiBuyOffer(BaseModel):
     price: int
 
 
+# assume no cycles in free offers (none yet)
 class FreeItemOffer(BaseModel):
     sku: str
     quantity: int
@@ -16,44 +17,55 @@ class FreeItemOffer(BaseModel):
 
 
 class CheckoutSolution:
+    def __init__(self):
+        # Define free item offers
+        self.free_item_offers = [
+            FreeItemOffer(sku="E", quantity=2, gift_sku="B", gift_quantity=1),
+            FreeItemOffer(sku="F", quantity=3, gift_sku="F", gift_quantity=1),
+        ]
+
+        # Define multibuy offers per SKU (sorted by quantity descending)
+        self.multibuy_offers = {
+            "A": [
+                MultiBuyOffer(quantity=5, price=200),
+                MultiBuyOffer(quantity=3, price=130),
+            ],
+            "B": [MultiBuyOffer(quantity=2, price=45)],
+        }
+
+        # Define base prices
+        self.base_prices = {
+            "A": 50,
+            "B": 30,
+            "C": 20,
+            "D": 15,
+            "E": 40,
+            "F": 10,
+        }
+
     def _apply_free_item_offers(self, items: Counter[str]) -> Counter[str]:
-        if "E" in items:
-            free_bs = items["E"] // 2
-            items["B"] = max(0, items["B"] - free_bs)
-        if "F" in items:
-            # Buy 2 get 1 free (3 in basket)
-            free_fs = items["F"] // 3
-            items["F"] = max(0, items["F"] - free_fs)
+        for offer in self.free_item_offers:
+            if offer.sku in items:
+                free_items = (items[offer.sku] // offer.quantity) * offer.gift_quantity
+                items[offer.gift_sku] = max(0, items[offer.gift_sku] - free_items)
         return items
 
     def _calculate_cost(self, sku: str, num_items: int):
-        match sku:
-            case "A":
-                # Multi-priced offers: (quantity, price) sorted by quantity descending
-                # TODO: maybe pydantic dict to hold all
-                offers = [(5, 200), (3, 130)]
-                cost = 0
-                remaining = num_items
+        if sku not in self.base_prices:
+            raise ValueError("Invalid SKU")
 
-                for quantity, price in offers:
-                    cost += (remaining // quantity) * price
-                    remaining = remaining % quantity
+        cost = 0
+        remaining = num_items
 
-                cost += remaining * 50
-                return cost
-            case "B":
-                offer_cost = num_items // 2
-                return offer_cost * 45 + (num_items % 2) * 30
-            case "C":
-                return num_items * 20
-            case "D":
-                return num_items * 15
-            case "E":
-                return num_items * 40
-            case "F":
-                return num_items * 10
-            case _:
-                raise ValueError("Invalid SKU")
+        # Apply multibuy offers if available
+        if sku in self.multibuy_offers:
+            for offer in self.multibuy_offers[sku]:
+                cost += (remaining // offer.quantity) * offer.price
+                remaining = remaining % offer.quantity
+
+        # Add cost for remaining items at base price
+        cost += remaining * self.base_prices[sku]
+        return cost
 
     # skus = unicode string
     def checkout(self, skus: str) -> int:
@@ -68,4 +80,5 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
+
 
