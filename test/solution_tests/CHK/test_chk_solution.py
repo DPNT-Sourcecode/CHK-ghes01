@@ -2,7 +2,7 @@ import pytest
 from solutions.CHK.checkout_solution import CheckoutSolution
 
 
-class TestSum:
+class TestCheckout:
     @pytest.mark.parametrize(
         "items,expected",
         [
@@ -55,7 +55,7 @@ class TestSum:
             ),  # 2A, 2B (1 free), 2C, 2D, 2E
             # Edge cases
             ("", 0),
-            ("INVALID", -1),
+            ("INVALID!", -1),
             ("A1", -1),
             ("a", -1),
             ("ABCa", -1),
@@ -75,3 +75,4 @@ class TestSum:
     )
     def test_checkout(self, items, expected):
         assert CheckoutSolution().checkout(items) == expected
+
