@@ -1,6 +1,6 @@
 from collections import Counter
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class MultiBuyOffer(BaseModel, frozen=True):
@@ -29,6 +29,12 @@ class GroupDiscountOffer(BaseModel, frozen=True):
 class GroupOfferResult(BaseModel, frozen=True):
     remaining_items: Counter[str]
     offer_cost: int
+
+    @field_validator("remaining_items")
+    @classmethod
+    def normalize_counter(cls, v):
+        # Remove zero and negative counts
+        return +v
 
 
 class CheckoutSolution:
@@ -161,7 +167,7 @@ class CheckoutSolution:
 
                 total_offer_cost += num_offers * offer.price
 
-        return GroupOfferResult(remaining_items=+items, offer_cost=total_offer_cost)
+        return GroupOfferResult(remaining_items=items, offer_cost=total_offer_cost)
 
     def calculate_multibuy_cost(
         self, items: Counter[str], multibuy_offers: dict[str, list[MultiBuyOffer]]
@@ -237,6 +243,7 @@ class CheckoutSolution:
         total_cost = self.calculate_multibuy_cost(ordered_items, self.multibuy_offers)
 
         return total_cost
+
 
 
 

@@ -207,7 +207,9 @@ class TestApplyGroupBuyOffers:
     def test_apply_group_buy_offers(self, items, offers, expected):
         solution = CheckoutSolution()
         result = solution.calculate_group_offer_discount(items, offers)
-        assert result == expected
+        assert results.remaining_items = expected.remaining_items
+        assert results.offer_cost = expected.offer_cost
+
 
 
 
