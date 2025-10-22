@@ -147,25 +147,26 @@ class CheckoutSolution:
             total_cost += cost
         return total_cost
 
-    # skus = unicode string
     def checkout(self, skus: str) -> int:
+        # skus = unicode string
         try:
             # Parse SKUs into item counts
             ordered_items = self.parse_skus(skus)
-
-            # Apply free item offers
-            ordered_items = self.apply_free_item_offers(
-                ordered_items, self.free_item_offers
-            )
-
-            # Calculate total cost
-            total_cost = self.calculate_total_cost(
-                ordered_items, self.base_prices, self.multibuy_offers
-            )
-
-            return total_cost
         except ValueError:
             return -1
+
+        # Apply free item offers
+        ordered_items = self.apply_free_item_offers(
+            ordered_items, self.free_item_offers
+        )
+
+        # Calculate total cost
+        total_cost = self.calculate_total_cost(
+            ordered_items, self.base_prices, self.multibuy_offers
+        )
+
+        return total_cost
+
 
 
 
