@@ -12,6 +12,7 @@ class TestSum:
             ("C", 20),
             ("D", 15),
             ("E", 40),
+            ("F", 10),
             # Item A multi-price offers: 5A for 200, 3A for 130, 1A for 50
             ("AA", 2 * 50),
             ("AAA", 130),
@@ -36,6 +37,15 @@ class TestSum:
             ("EEEEBBB", 4 * 40 + 30),  # 4E + 3B (2 free, 1 paid)
             ("EEEEBBBB", 4 * 40 + 45),  # 4E + 4B (2 free, 2 paid with offer)
             ("BEBEEE", 4 * 40 + 0),  # Order shouldn't matter: 4E + 2B (both free)
+            # Item F - buy 2F get 1F free (requires 3 total): 1F for 10
+            ("FF", 2 * 10),
+            ("FFF", 2 * 10),  # 3F: pay for 2, get 1 free
+            ("FFFF", 3 * 10),  # 4F: pay for 3
+            ("FFFFF", 4 * 10),  # 5F: pay for 4
+            ("FFFFFF", 4 * 10),  # 6F: pay for 4 (2 groups of 3)
+            ("FFFFFFF", 5 * 10),  # 7F: pay for 5
+            ("FFFFFFFF", 6 * 10),  # 8F: pay for 6
+            ("FFFFFFFFF", 6 * 10),  # 9F: pay for 6 (3 groups of 3)
             # Mixed items
             ("ABCD", 50 + 30 + 20 + 15),
             ("ABCDE", 50 + 30 + 20 + 15 + 40),
@@ -65,5 +75,6 @@ class TestSum:
     )
     def test_checkout(self, items, expected):
         assert CheckoutSolution().checkout(items) == expected
+
 
 

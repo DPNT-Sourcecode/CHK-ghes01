@@ -7,6 +7,7 @@ class CheckoutSolution:
             free_bs = items["E"] // 2
             items["B"] = max(0, items["B"] - free_bs)
         if "F" in items:
+            # Buy 2 get 1 free (3 in basket)
             free_fs = items["F"] // 3
             items["F"] = max(0, items["F"] - free_fs)
         return items
@@ -35,6 +36,8 @@ class CheckoutSolution:
                 return num_items * 15
             case "E":
                 return num_items * 40
+            case "F":
+                return num_items * 10
             case _:
                 raise ValueError("Invalid SKU")
 
@@ -51,6 +54,7 @@ class CheckoutSolution:
             return total_cost
         except ValueError as e:
             return -1
+
 
 
 
